@@ -1,36 +1,63 @@
-# Machine Learning Algorithms From Scratch
+# Machine Learning Algorithms Implementation from Scratch
 
-This repository contains implementations of fundamental Machine Learning algorithms built entirely from scratch using Python and NumPy. The goal is to demonstrate a deep understanding of the mathematical foundations behind these algorithms without relying on high-level libraries like Scikit-Learn.
+## Overview
+This repository contains implementations of fundamental Machine Learning algorithms built entirely from scratch using **Python** and **NumPy**. 
 
-## Algorithms Implemented
+The primary objective of this project is to demonstrate a deep understanding of the mathematical underpinnings of these algorithms (Linear Algebra, Euclidean Geometry, Vector Calculus) by implementing them without relying on high-level abstractions like Scikit-Learn.
 
-### 1. k-Nearest Neighbors (k-NN)
+## Contents
+
+### 1. k-Nearest Neighbors (k-NN) Classification
 **File:** `k_nearest_neighbors.py`
-- Implements the k-NN classification algorithm using Euclidean distance.
-- Features custom functions for data splitting, accuracy evaluation, and sensitivity analysis across different 'k' values.
-- Includes visualization of decision boundaries using Matplotlib.
+**Dataset:** `CustomerDataset_Q1.csv`
+*   **Implementation:** Developed a custom k-NN classifier using Euclidean distance calculations.
+*   **Features:** 
+    *   Manual implementation of majority voting logic.
+    *   Sensitivity analysis comparing performance across $k=1$ to $k=4$.
+    *   Impact analysis of varying training set splits (80/20 vs 50/50).
 
-### 2. K-Means Clustering
+### 2. K-Means Clustering (Unsupervised Learning)
 **File:** `k_means_clustering.py`
-- Implements the K-Means unsupervised learning algorithm.
-- Manually handles centroid initialization, distance calculation, and cluster reassignment loops.
-- Visualizes the convergence of centroids and customer segmentation groups.
+**Dataset:** `CustomerProfiles_Q2.csv`
+*   **Implementation:** Built the K-Means algorithm to segment customer profiles based on spending habits.
+*   **Features:**
+    *   Random centroid initialization.
+    *   Iterative convergence loop based on minimizing intra-cluster variance.
+    *   Visualization of cluster separation.
 
 ### 3. Perceptron Neural Network
 **File:** `perceptron_neural_network.py`
-- Implements a single-layer Perceptron for binary classification (Linear Separability).
-- Features manual weight updates, bias calculation, and step activation functions.
-- achieving 100% convergence on the sample weather dataset.
+**Dataset:** `WeatherData_Q3.csv`
+*   **Implementation:** Constructed a single-layer Perceptron for binary classification (Linear Separability).
+*   **Features:**
+    *   Manual coding of weight updates and bias terms.
+    *   Step activation function implementation.
+    *   Achieved 100% convergence on linearly separable weather data.
 
-## Technologies Used
-- **Python 3.x**
-- **NumPy** (for vector/matrix math)
-- **Matplotlib** (for data visualization)
-- **Pandas** (for data loading)
+---
+
+## Technical Analysis Report
+For a detailed breakdown of the results, including decision boundary visualizations, convergence graphs, and an additional analysis on **Constraint Satisfaction Problems (AC-3 Algorithm)**, please refer to the technical report included in this repository:
+
+📄 **[View Technical Analysis Report (PDF)](Technical_Analysis_Report.pdf)**
+
+---
+
+## Dependencies
+*   **Python 3.x**
+*   **NumPy:** For vector and matrix operations.
+*   **Matplotlib:** For data visualization.
+*   **Pandas:** For CSV data loading.
 
 ## How to Run
-1. Clone the repository.
-2. Ensure the `.csv` datasets are in the same directory as the scripts.
-3. Run any script:
-   ```bash
-   python k_nearest_neighbors.py
+Ensure the `.csv` datasets are located in the same directory as the scripts. You can run each algorithm individually via the terminal:
+
+```bash
+# Run k-NN Classification
+python k_nearest_neighbors.py
+
+# Run K-Means Clustering
+python k_means_clustering.py
+
+# Run Perceptron Neural Network
+python perceptron_neural_network.py
