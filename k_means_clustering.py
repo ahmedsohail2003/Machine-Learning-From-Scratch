@@ -49,9 +49,12 @@ def k_means(data, k):
     # Convert data to numpy array for easier computation
     data = np.array(data)
     n = len(data)
-    
-    # Step 1: Select the first k data points as initial centroids
-    centroids = data[:k].copy()
+
+    # Step 1: Randomly initialize centroids by picking k distinct data points.
+    # A fixed seed is set so the random initialization is reproducible.
+    np.random.seed(42)
+    initial_indices = np.random.choice(n, size=k, replace=False)
+    centroids = data[initial_indices].copy()
     
     # Initialize variables
     prev_centroids = None

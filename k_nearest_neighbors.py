@@ -67,25 +67,39 @@ def fnKNN(dataset, new_point, k):
     
     # Sort by distance
     distances.sort(key=lambda x: x[0])
-    
-    # Take k nearest neighbors
-    k_nearest = distances[:k]
-    
-    # Count votes for each class
-    class_0_votes = 0
-    class_1_votes = 0
-    
-    for _, label in k_nearest:
-        if label == 0:
-            class_0_votes += 1
-        else:
-            class_1_votes += 1
-    
-    # Return the class with more votes
-    if class_1_votes > class_0_votes:
-        return 1
-    else:
-        return 0
+
+    # Explicit, documented tie-break:
+    # Decrement the effective number of neighbors until the majority vote is
+    # no longer tied. Because the neighbors are sorted by distance, dropping the
+    # farthest neighbor each step means a tie is ultimately broken in favor of
+    # the closer neighbors (and at k_effective == 1, by the single nearest one).
+    # This avoids silently defaulting ties to class 0.
+    k_effective = k
+    while k_effective > 0:
+        # Take the k_effective nearest neighbors
+        k_nearest = distances[:k_effective]
+
+        # Count votes for each class
+        class_0_votes = 0
+        class_1_votes = 0
+
+        for _, label in k_nearest:
+            if label == 0:
+                class_0_votes += 1
+            else:
+                class_1_votes += 1
+
+        # If there is a clear majority, return it
+        if class_1_votes > class_0_votes:
+            return 1
+        elif class_0_votes > class_1_votes:
+            return 0
+
+        # Tie: drop the farthest neighbor and re-vote with a smaller k
+        k_effective -= 1
+
+    # Fallback (only reachable if k <= 0): default to class 0
+    return 0
 
 # Functions for dataset splitting and evaluation (Part C)
 def split_dataset(dataset, train_ratio, random_seed=42):
@@ -276,9 +290,11 @@ if __name__ == "__main__":
     # Analyze the effect of training set size
     print("\nEffect of Training Set Size:")
     print("Looking at how the training set size affects performance:")
-    print("- Larger training sets (80%) consistently provide better accuracy across all k values")
-    print("- The performance drop is most dramatic when reducing from 80% to 50% training data")
-    print("- This demonstrates the importance of sufficient training examples for k-NN")
+    ratio_avg = {ratio: sum(results[k][ratio] for k in k_values) / len(k_values) for ratio in split_ratios}
+    best_ratio = max(ratio_avg, key=ratio_avg.get)
+    print("- Average accuracy by training split: " + ", ".join(f"{int(r*100)}%={ratio_avg[r]:.4f}" for r in split_ratios))
+    print(f"- On this dataset, the {int(best_ratio*100)}% training split gives the highest average accuracy across the tested k values")
+    print("- This is consistent with k-NN generally benefiting from more training examples, though results vary on this small dataset")
     
     # Determine best combination
     best_k_ratio = (1, 0.8)  # initialize with first option
@@ -338,29 +354,32 @@ def part_e_analysis(results, k_values, split_ratios):
         k_consistency[k] = (std_dev)**0.5  # standard deviation
     
     most_consistent_k = min(k_consistency, key=k_consistency.get)
-    
-    # Provide comprehensive analysis
-    print(f"Based on the results, I recommend k={3} with {80}% training data as the optimal combination.")
+
+    # Provide analysis based on the actually-computed results (no hardcoded conclusion).
+    print(f"Based on the results, the best single combination is k={best_k} with "
+          f"{int(best_ratio*100)}% training data.")
     print("\nJustification:")
     print("1. Accuracy Performance:")
-    print(f"   - This combination achieves {results[3][0.8]:.4f} accuracy, matching the highest in our tests")
-    print(f"   - k=1 also achieves the same accuracy with 80% training data")
-    
+    print(f"   - This combination achieves {best_accuracy:.4f} accuracy, the highest in our tests")
+
     print("\n2. Consistency and Robustness:")
-    print("   - When comparing how different k values perform across various training set sizes:")
-    print(f"   - k=3 shows more consistent performance (especially on smaller training sets)")
-    print(f"   - With 50% training data, k=3 achieves 0.8000 accuracy versus 0.5000 for k=1")
-    
+    print("   - Comparing how different k values perform across the training set sizes:")
+    print(f"   - The most consistent k value (lowest std. dev. across splits) is "
+          f"k={most_consistent_k} (std={k_consistency[most_consistent_k]:.4f})")
+    print(f"   - The k value with the best average accuracy across splits is "
+          f"k={max(avg_performance, key=avg_performance.get)} "
+          f"(avg={max(avg_performance.values()):.4f})")
+
     print("\n3. Theoretical Considerations:")
-    print("   - k=1 uses only the single closest neighbor, making it more susceptible to noise")
-    print("   - k=3 provides a balance between capturing the decision boundary and reducing noise sensitivity")
-    print("   - For this dataset size (20 points), k=3 represents a reasonable proportion of neighbors")
-    
+    print("   - Smaller k (e.g. k=1) uses fewer neighbors, making it more susceptible to noise")
+    print("   - Larger k smooths the decision boundary and reduces noise sensitivity")
+    print(f"   - For this dataset size, k={best_k} balances these trade-offs for the best measured accuracy")
+
     print("\nConclusion:")
-    print("While both k=1 and k=3 achieve perfect accuracy with 80% training data, k=3 demonstrates")
-    print("greater robustness across different training set sizes, suggesting better generalization")
-    print("capability. This makes k=3 with 80% training data the recommended combination for")
-    print("this customer classification task.")
+    print(f"The recommended combination for this customer classification task is "
+          f"k={best_k} with {int(best_ratio*100)}% training data, which achieved the highest")
+    print(f"measured accuracy ({best_accuracy:.4f}). If robustness across splits matters more, "
+          f"k={most_consistent_k} is the most consistent choice.")
 
 if __name__ == "__main__":
     part_e_analysis(results, k_values, split_ratios)
