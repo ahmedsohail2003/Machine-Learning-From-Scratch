@@ -61,3 +61,12 @@ python k_means_clustering.py
 
 # Run Perceptron Neural Network
 python perceptron_neural_network.py
+```
+
+## Testing
+Unit tests live in the `tests/` directory and are run with **pytest**. Install the development dependencies and run the suite from the repository root:
+
+```bash
+pip install -r requirements-dev.txt
+pytest
+```
