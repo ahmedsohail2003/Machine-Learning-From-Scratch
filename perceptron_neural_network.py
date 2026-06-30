@@ -141,6 +141,30 @@ def main():
     print(f"Training accuracy: {train_accuracy:.2f}")
     print(f"Test accuracy: {test_accuracy:.2f}")
 
+    # PROBLEM 3C: Visualize the learned decision boundary
+    # The perceptron learns w0*temp + w1*humid + b = 0; solving for humid gives the
+    # separating line. Plotting it over the data shows how the two classes are split.
+    w0, w1 = perceptron.weights
+    b = perceptron.bias
+    plt.figure(figsize=(10, 6))
+    plt.scatter(no_rain_data['temp'], no_rain_data['humid'],
+                color='blue', marker='s', s=100, label='No Rain (y=0)')
+    plt.scatter(rain_data['temp'], rain_data['humid'],
+                color='red', marker='o', s=100, label='Rain (y=1)')
+    x_min, x_max = weather_data['temp'].min() - 0.05, weather_data['temp'].max() + 0.05
+    xs = np.linspace(x_min, x_max, 100)
+    if abs(w1) > 1e-9:
+        ys = -(w0 * xs + b) / w1
+        plt.plot(xs, ys, 'k--', linewidth=2, label='Decision boundary')
+    plt.xlabel('Temperature (scaled)')
+    plt.ylabel('Humidity (scaled)')
+    plt.title('Perceptron Decision Boundary (Rain vs. No Rain)')
+    plt.legend()
+    plt.grid(True, linestyle='--', alpha=0.7)
+    plt.ylim(weather_data['humid'].min() - 0.05, weather_data['humid'].max() + 0.05)
+    plt.tight_layout()
+    plt.show()
+
     # Plot training errors over iterations (if the perceptron didn't converge immediately)
     if len(errors) > 1:
         plt.figure(figsize=(10, 6))
